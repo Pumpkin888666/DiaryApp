@@ -1,6 +1,9 @@
+import 'package:diaryapp/main.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import '../funcs/getData.dart';
+import '../funcs/requestApi.dart';
+import 'package:provider/provider.dart';
+import '../models/app_ini.dart';
 
 class Load extends StatefulWidget {
   const Load({super.key});
@@ -13,8 +16,6 @@ class _LoadState extends State<Load> {
   String _message = '正在检查软件可用性';
   bool _reCheck = false;
   Color _textColor = Colors.black;
-  int _reCheckTimes = 0;
-  int _maxReCheckTimes = 5;
 
   @override
   void initState() {
@@ -24,23 +25,29 @@ class _LoadState extends State<Load> {
 
   Future<void> _getAppInI() async {
     try {
-      var StartTime = DateTime.now().millisecondsSinceEpoch;
-      final response = await getData('getAppInI');
-      var EndTime = DateTime.now().millisecondsSinceEpoch;
-      var LoadTime = EndTime - StartTime;
+      final response = await requestApi('getAppInI');
 
       if (response != false) {
         final data = json.decode(response.body);
-        if (LoadTime < 1000) {
-          await Future.delayed(const Duration(milliseconds: 1000));
-        }
         setState(() {
           if (data['code'] == 0) {
             _message = '正在加载软件资源';
+            _textColor = Colors.black;
+            _reCheck = false;
+          }else{
+            _message = 'Cloud Error ${data['code']}';
+            _textColor = Colors.red;
+            _reCheck = true;
           }
-          _textColor = Colors.black;
-          _reCheck = false;
         });
+        final app_ini = data['data'];
+        final appInI = Provider.of<AppInI>(context,listen: false);
+        appInI.set_ini(app_ini);
+        await precacheImage(
+            NetworkImage(
+                app_ini['login_post_url']
+            ),
+            context);
         Navigator.pushNamed(context, '/login');
       } else {
         // 请求失败
@@ -70,9 +77,16 @@ class _LoadState extends State<Load> {
             const SizedBox(
               height: 50,
             ),
-            Hero(tag: 'logoHero', child: Image.asset('assets/logo.png')),
+            Hero(
+                tag: 'logoHero',
+                child: Image.asset(
+                  'assets/logo.png',
+                  width: 220,
+                  height: 220,
+                  fit: BoxFit.cover,
+                )),
             const SizedBox(
-              height: 130,
+              height: 80,
             ),
             Text(
               _message,
@@ -85,13 +99,10 @@ class _LoadState extends State<Load> {
                 ? const CircularProgressIndicator()
                 : ElevatedButton(
                     onPressed: () {
-                      if (_reCheckTimes < _maxReCheckTimes) {
-                        setState(() {
-                          _reCheck = false;
-                          _getAppInI();
-                          _reCheckTimes++;
-                        });
-                      }
+                      setState(() {
+                        _reCheck = false;
+                        _getAppInI();
+                      });
                     },
                     child: const Text('重试')),
           ],

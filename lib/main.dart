@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 import 'pages/load.dart';
 import 'pages/login.dart';
+import 'package:provider/provider.dart';
+import 'models/app_ini.dart';
 
-void main() async {
+void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
+  windowManager.setResizable(false);
 
   WindowOptions windowOptions = const WindowOptions(
     size: Size(1000, 600),
@@ -19,7 +22,14 @@ void main() async {
     await windowManager.focus();
   });
 
-  runApp(const App());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => AppInI()), // AppInI model
+      ],
+      child: const App(),
+    ),
+  );
 }
 
 class App extends StatelessWidget {
