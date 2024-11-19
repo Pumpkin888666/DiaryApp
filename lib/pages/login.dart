@@ -203,6 +203,9 @@ class _LoginState extends State<Login> {
                 const SizedBox(
                   height: 10,
                 ),
+                Column(
+                  children: [
+
                 AnimatedContainer(
                   height: 35,
                   curve: Curves.easeInOut,
@@ -229,6 +232,8 @@ class _LoginState extends State<Login> {
                       )
                           : Text(
                         _message,
+                        softWrap: false,
+                        overflow: TextOverflow.clip,
                       ),
                     ),
                   ),
@@ -252,6 +257,8 @@ class _LoginState extends State<Login> {
                         _message1,
                       ),
                   ),
+                ),
+                  ],
                 ),
 
                 const SizedBox(
