@@ -17,11 +17,9 @@ class _LoginState extends State<Login> {
   final TextEditingController _passwordController = TextEditingController();
   final _loginFormKey = GlobalKey<FormState>();
   String _message = 'Login';
-  String _message1 = 'Login';
   ButtonStyle _loginButtonStyle = ButtonStyle();
   bool _isLoading = false;
   double _loginButtonWidth = 110;
-  final GlobalKey _loginButtonKey_hide = GlobalKey();
   Icon _buttonIcon = const Icon(Icons.login);
 
   @override
@@ -38,12 +36,7 @@ class _LoginState extends State<Login> {
     if (_loginFormKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
-      });
-      await Future.delayed(const Duration(milliseconds: 10));
-      RenderBox renderBox = _loginButtonKey_hide.currentContext?.findRenderObject() as RenderBox;
-      var size = renderBox.size;
-      setState(() {
-        _loginButtonWidth = size.width + 30;
+        _loginButtonWidth = 80;
       });
       await Future.delayed(const Duration(seconds: 1)); // 让按钮动画好看一点 呵呵
 
@@ -60,26 +53,27 @@ class _LoginState extends State<Login> {
             break;
           case -2001:
             setState(() {
-              _message1 = '未知账户';
-              _isLoading = false;
-            });
-            await Future.delayed(const Duration(milliseconds: 10));
-            RenderBox renderBox = _loginButtonKey_hide.currentContext?.findRenderObject() as RenderBox;
-            var size = renderBox.size;
-            setState(() {
+              _isLoading  = false;
               _message = '未知账户';
               _loginButtonStyle = ElevatedButton.styleFrom(
                 backgroundColor: Colors.red, // 背景颜色
                 foregroundColor: Colors.white, // 字体颜色
               );
-              _loginButtonWidth = size.width + 30;
+              _loginButtonWidth = _message.length * 25 + 30;
               _buttonIcon = const Icon(Icons.error_outline);
             });
             break;
         }
       }else{
         setState(() {
+          _isLoading  = false;
           _message = 'Cloud Error';
+          _loginButtonStyle = ElevatedButton.styleFrom(
+            backgroundColor: Colors.red, // 背景颜色
+            foregroundColor: Colors.white, // 字体颜色
+          );
+          _loginButtonWidth = _message.length * 25 + 30;
+          _buttonIcon = const Icon(Icons.error_outline);
         });
       }
     }
@@ -236,26 +230,6 @@ class _LoginState extends State<Login> {
                         overflow: TextOverflow.clip,
                       ),
                     ),
-                  ),
-                ),
-
-                Container(
-                  height: 0,
-                  child: ElevatedButton(
-                    key: _loginButtonKey_hide,
-                    onPressed: _isLoading ? null : Login, // 加载时禁用按钮
-                    child:  _isLoading
-                          ? const SizedBox(
-                        width: 15, // 设置加载动画的宽度
-                        height: 15, // 设置加载动画的高度
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          strokeWidth: 3, // 设置加载动画的宽度
-                        ),
-                      )
-                          : Text(
-                        _message1,
-                      ),
                   ),
                 ),
                   ],
