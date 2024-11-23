@@ -1,9 +1,8 @@
-import 'package:diaryapp/main.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import '../funcs/requestApi.dart';
+import 'package:diaryapp/funcs/requestApi.dart';
 import 'package:provider/provider.dart';
-import '../models/app_ini.dart';
+import 'package:diaryapp/models/app_ini.dart';
 
 class Load extends StatefulWidget {
   const Load({super.key});

@@ -1,5 +1,5 @@
 import 'package:http/http.dart' as http;
-import '../config.dart';
+import 'package:diaryapp/config.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 

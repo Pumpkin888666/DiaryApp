@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import '../funcs/requestApi.dart';
+import 'package:diaryapp/funcs/requestApi.dart';
 import 'package:provider/provider.dart';
-import '../models/app_ini.dart';
+import 'package:diaryapp/models/app_ini.dart';
+import 'package:diaryapp/widget/PumpkinImage.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -12,7 +13,6 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  double _postWidth = 0.0;
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final _loginFormKey = GlobalKey<FormState>();
@@ -21,18 +21,7 @@ class _LoginState extends State<Login> {
   bool _isLoading = false;
   double _loginButtonWidth = 110;
   Icon _buttonIcon = const Icon(Icons.login);
-
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(const Duration(milliseconds: 100), () {
-      setState(() {
-        _postWidth = 300;
-      });
-    });
-  }
-
-  Future<void> Login() async {
+  Future<void> _login() async {
     if (_loginFormKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
@@ -45,28 +34,58 @@ class _LoginState extends State<Login> {
         'password': _passwordController.text,
       };
 
-      final response = await requestApi('app_login',LoginForm);
-      if(response != false){
+      final response = await requestApi('app_login', LoginForm);
+      if (response != false) {
         Map data = jsonDecode(response.body);
-        switch(data['code']){
+        setState(() {
+          _isLoading = false;
+        });
+        switch (data['code']) {
           case 0:
+            setState(() {
+              _isLoading = false;
+              _message = '登录成功';
+              _loginButtonWidth = _message.length * 25 + 30;
+              _buttonIcon = const Icon(Icons.check);
+              _loginButtonStyle = ElevatedButton.styleFrom(
+                backgroundColor: Colors.green, // 背景颜色
+                foregroundColor: Colors.white, // 字体颜色
+              );
+            });
             break;
           case -2001:
             setState(() {
-              _isLoading  = false;
               _message = '未知账户';
-              _loginButtonStyle = ElevatedButton.styleFrom(
-                backgroundColor: Colors.red, // 背景颜色
-                foregroundColor: Colors.white, // 字体颜色
-              );
+              _loginButtonWidth = _message.length * 25 + 30;
+              _buttonIcon = const Icon(Icons.person);
+            });
+            break;
+          case -2002:
+            setState(() {
+              _message = '账户状态异常';
               _loginButtonWidth = _message.length * 25 + 30;
               _buttonIcon = const Icon(Icons.error_outline);
             });
             break;
+          case -2003:
+            setState(() {
+              _message = '密码错误';
+              _loginButtonWidth = _message.length * 25 + 30;
+              _buttonIcon = const Icon(Icons.password);
+            });
         }
-      }else{
         setState(() {
-          _isLoading  = false;
+          // 在这之前登录成功不会有这个效果
+          if (data['code'] != 0) {
+            _loginButtonStyle = ElevatedButton.styleFrom(
+              backgroundColor: Colors.red, // 背景颜色
+              foregroundColor: Colors.white, // 字体颜色
+            );
+          }
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
           _message = 'Cloud Error';
           _loginButtonStyle = ElevatedButton.styleFrom(
             backgroundColor: Colors.red, // 背景颜色
@@ -91,45 +110,7 @@ class _LoginState extends State<Login> {
             width: 300,
             child: Column(
               children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  width: _postWidth,
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Image.network(
-                      app_ini!['login_post_url'],
-                      width: _postWidth,
-                      fit: BoxFit.fill,
-                      height: MediaQuery.of(context).size.height,
-                      loadingBuilder: (BuildContext context, Widget child,
-                          ImageChunkEvent? loadingProgress) {
-                        if (loadingProgress == null) {
-                          // 图片加载完成，返回图片
-                          return child;
-                        } else {
-                          // 图片加载过程中，返回进度指示器
-                          return Column(
-                            children: [
-                              const SizedBox(
-                                height: 200,
-                              ),
-                              Center(
-                                child: CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes !=
-                                          null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                          (loadingProgress.expectedTotalBytes ??
-                                              1)
-                                      : null,
-                                ),
-                              ),
-                            ],
-                          );
-                        }
-                      },
-                    ),
-                  ),
-                )
+                PumpkinImage(url: app_ini!['login_post_url'])
               ],
             ),
           ),
@@ -199,42 +180,45 @@ class _LoginState extends State<Login> {
                 ),
                 Column(
                   children: [
-
-                AnimatedContainer(
-                  height: 35,
-                  curve: Curves.easeInOut,
-                  duration: const Duration(milliseconds: 150), // 设置按钮大小变化的过渡时间
-                  width: _loginButtonWidth,
-                  child: ElevatedButton.icon(
-                    icon: _isLoading ? null : _buttonIcon,
-                    onPressed: _isLoading ? null : Login, // 加载时禁用按钮
-                    style: _loginButtonStyle,
-                    label: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 150), // 设置按钮内部内容过渡的时间
-                      transitionBuilder: (Widget child, Animation<double> animation) {
-                        // 使用 FadeTransition 或其他过渡效果
-                        return FadeTransition(opacity: animation, child: child);
-                      },
-                      child: _isLoading
-                          ? const SizedBox(
-                        width: 15, // 设置加载动画的宽度
-                        height: 15, // 设置加载动画的高度
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          strokeWidth: 3, // 设置加载动画的宽度
+                    AnimatedContainer(
+                      height: 35,
+                      curve: Curves.easeInOut,
+                      duration: const Duration(milliseconds: 150),
+                      // 设置按钮大小变化的过渡时间
+                      width: _loginButtonWidth,
+                      child: ElevatedButton.icon(
+                        icon: _isLoading ? null : _buttonIcon,
+                        onPressed: _isLoading ? null : _login, // 加载时禁用按钮
+                        style: _loginButtonStyle,
+                        label: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 150),
+                          // 设置按钮内部内容过渡的时间
+                          transitionBuilder:
+                              (Widget child, Animation<double> animation) {
+                            // 使用 FadeTransition 或其他过渡效果
+                            return FadeTransition(
+                                opacity: animation, child: child);
+                          },
+                          child: _isLoading
+                              ? const SizedBox(
+                                  width: 15, // 设置加载动画的宽度
+                                  height: 15, // 设置加载动画的高度
+                                  child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
+                                    strokeWidth: 3, // 设置加载动画的宽度
+                                  ),
+                                )
+                              : Text(
+                                  _message,
+                                  softWrap: false,
+                                  overflow: TextOverflow.clip,
+                                ),
                         ),
-                      )
-                          : Text(
-                        _message,
-                        softWrap: false,
-                        overflow: TextOverflow.clip,
                       ),
                     ),
-                  ),
-                ),
                   ],
                 ),
-
                 const SizedBox(
                   height: 10,
                 ),

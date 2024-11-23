@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
-import 'pages/load.dart';
-import 'pages/login.dart';
+import 'package:diaryapp/pages/load.dart';
+import 'package:diaryapp/pages/login.dart';
 import 'package:provider/provider.dart';
 import 'models/app_ini.dart';
 
