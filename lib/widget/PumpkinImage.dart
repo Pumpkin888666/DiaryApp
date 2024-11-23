@@ -21,7 +21,7 @@ class _PumpkinImageState extends State<PumpkinImage>
     // 创建动画控制器
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 800),
     );
 
     // 定义宽度的动画，范围从0到1
