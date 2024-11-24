@@ -66,6 +66,7 @@ class _LoginState extends State<Login> {
                 foregroundColor: Colors.white, // 字体颜色
               );
             });
+            Navigator.pushNamed(context, '/home');
             break;
           case -2001:
             setState(() {
@@ -198,7 +199,9 @@ class _LoginState extends State<Login> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       ElevatedButton.icon(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          Navigator.pushNamed(context, '/home');
+                                        },
                                         icon: const Icon(Icons.east),
                                         label: const Text('直接登录'),
                                         style: ElevatedButton.styleFrom(

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:diaryapp/pages/load.dart';
 import 'package:diaryapp/pages/login.dart';
+import 'package:diaryapp/pages/Home.dart';
 import 'package:provider/provider.dart';
-import 'models/app_ini.dart';
+import 'package:diaryapp/models/app_ini.dart';
 
 void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,6 +46,7 @@ class App extends StatelessWidget {
       routes: {
         '/': (context) => const Load(),
         '/login': (context) => const Login(),
+        '/home': (context) => const Home(),
       },
     );
   }
