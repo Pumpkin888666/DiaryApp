@@ -47,7 +47,7 @@ class _LoadState extends State<Load> {
                 app_ini['login_post_url']
             ),
             context);
-        Navigator.pushNamed(context, '/login');
+        Navigator.pushReplacementNamed(context, '/login');
       } else {
         // 请求失败
         setState(() {
