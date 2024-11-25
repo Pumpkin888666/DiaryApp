@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:diaryapp/models/app_ini.dart';
 import 'package:diaryapp/widget/PumpkinImage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:diaryapp/funcs/getStrUILength.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -59,7 +60,7 @@ class _LoginState extends State<Login> {
             setState(() {
               _isLoading = false;
               _message = '登录成功';
-              _loginButtonWidth = _message.length * 25 + 30;
+              _loginButtonWidth = getStrUILength(_message,30);
               _buttonIcon = const Icon(Icons.check);
               _loginButtonStyle = ElevatedButton.styleFrom(
                 backgroundColor: Colors.green, // 背景颜色
@@ -71,21 +72,21 @@ class _LoginState extends State<Login> {
           case -2001:
             setState(() {
               _message = '未知账户';
-              _loginButtonWidth = _message.length * 25 + 30;
+              _loginButtonWidth = getStrUILength(_message,30);
               _buttonIcon = const Icon(Icons.person);
             });
             break;
           case -2002:
             setState(() {
               _message = '账户状态异常';
-              _loginButtonWidth = _message.length * 25 + 30;
+              _loginButtonWidth = getStrUILength(_message,30);
               _buttonIcon = const Icon(Icons.error_outline);
             });
             break;
           case -2003:
             setState(() {
               _message = '密码错误';
-              _loginButtonWidth = _message.length * 25 + 30;
+              _loginButtonWidth = getStrUILength(_message,30);
               _buttonIcon = const Icon(Icons.password);
             });
         }
@@ -106,7 +107,7 @@ class _LoginState extends State<Login> {
             backgroundColor: Colors.red, // 背景颜色
             foregroundColor: Colors.white, // 字体颜色
           );
-          _loginButtonWidth = _message.length * 25 + 30;
+          _loginButtonWidth = getStrUILength(_message,30);
           _buttonIcon = const Icon(Icons.error_outline);
         });
       }
