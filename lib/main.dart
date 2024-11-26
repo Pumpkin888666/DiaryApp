@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:diaryapp/pages/load.dart';
 import 'package:diaryapp/pages/login.dart';
-import 'package:diaryapp/pages/Home.dart';
+import 'package:diaryapp/pages/appView.dart';
 import 'package:provider/provider.dart';
 import 'package:diaryapp/models/app_ini.dart';
 
@@ -46,7 +46,7 @@ class App extends StatelessWidget {
       routes: {
         '/': (context) => const Load(),
         '/login': (context) => const Login(),
-        '/home': (context) => const Home(),
+        '/appview': (context) => const AppView(),
       },
     );
   }
