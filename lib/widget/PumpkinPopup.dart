@@ -130,6 +130,7 @@ class PumpkinPopupState extends State<PumpkinPopup>
 
       _overlayEntry.remove();
       _overlayMask.remove();
+
     }
   }
 
@@ -263,8 +264,13 @@ class PumpkinPopupState extends State<PumpkinPopup>
                                       icon: const Icon(Icons.close))
                                 ],
                               ),
-                              Container(
-                                child: widget.child,
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Container(
+                                  width: width,
+                                  height: height,
+                                  child: widget.child,
+                                ),
                               )
                             ],
                           ),

@@ -23,6 +23,7 @@ class _AppViewState extends State<AppView> {
   }
 
   void _getUserInformation() async {
+    await Future.delayed(const Duration(milliseconds: 1000));
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
     int? heartbeat = prefs.getInt('heartbeat');

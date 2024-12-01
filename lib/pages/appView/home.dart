@@ -2,14 +2,11 @@ import 'package:diaryapp/models/user_information.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:diaryapp/widget/PumpkinLoading.dart';
-import 'package:diaryapp/widget/PumpkinPopup.dart';
 
 class home extends StatefulWidget {
   @override
   State<home> createState() => _homeState();
 }
-
-final GlobalKey<PumpkinPopupState> popup_key = GlobalKey();
 
 class _homeState extends State<home> {
   @override
@@ -32,14 +29,6 @@ class _homeState extends State<home> {
     }
   }
 
-  void somefunc() async {
-    popup_key.currentState?.auto(context);
-
-    await Future.delayed(const Duration(seconds: 1));
-
-    popup_key.currentState?.handoffLoading(context);
-  }
-
   @override
   Widget build(BuildContext context) {
     final userInformation = Provider.of<UserInformation>(context);
@@ -59,34 +48,9 @@ class _homeState extends State<home> {
                       style: const TextStyle(fontSize: 40),
                     ),
                   ),
-                  ElevatedButton.icon(
-                    onPressed: somefunc,
-                    label: const Text('popup'),
-                    icon: Icon(Icons.ads_click),
-                  ),
                 ],
-              ),
-              PumpkinPopup(
-                key: popup_key,
-                defaultHeight: 300,
-                defaultWidth: 500,
-                child: some(),
-                defaultLoading: true,
-                whenHitBlack: true,
               ),
             ],
           );
-  }
-}
-
-class some extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-        onPressed: () {
-          popup_key.currentState?.changeSize(Size(400, 200));
-          print('success');
-        },
-        child: const Text('change size'));
   }
 }

@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:diaryapp/models/app_ini.dart';
 import 'package:diaryapp/models/user_information.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:diaryapp/pages/login.dart';
+import 'package:diaryapp/widget/PumpkinPopup.dart';
 
 Future<dynamic> requestApi(BuildContext context, String act,
     [Map<String, dynamic>? data]) async {
