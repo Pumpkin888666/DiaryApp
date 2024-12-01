@@ -5,6 +5,7 @@ import 'package:diaryapp/pages/login.dart';
 import 'package:diaryapp/pages/appView.dart';
 import 'package:provider/provider.dart';
 import 'package:diaryapp/models/app_ini.dart';
+import 'package:diaryapp/models/user_information.dart';
 
 void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +28,7 @@ void main(List<String> args) async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => AppInI()), // AppInI model
+        ChangeNotifierProvider(create: (context) => UserInformation()), // UserInformation model
       ],
       child: const App(),
     ),

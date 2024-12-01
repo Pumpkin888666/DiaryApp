@@ -24,7 +24,7 @@ class _LoadState extends State<Load> {
 
   Future<void> _getAppInI() async {
     try {
-      final response = await requestApi('getAppInI');
+      final response = await requestApi(context,'getAppInI');
 
       if (response != false) {
         final data = json.decode(response.body);

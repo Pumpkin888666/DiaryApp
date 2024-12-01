@@ -6,6 +6,7 @@ import 'package:diaryapp/models/app_ini.dart';
 import 'package:diaryapp/widget/PumpkinImage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:diaryapp/funcs/getStrUILength.dart';
+import 'package:diaryapp/widget/PumpkinLoading.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -45,7 +46,7 @@ class _LoginState extends State<Login> {
         'password': _passwordController.text,
       };
 
-      final response = await requestApi('app_login', LoginForm);
+      final response = await requestApi(context,'app_login', LoginForm);
       if (response != false) {
         Map data = jsonDecode(response.body);
         setState(() {
@@ -116,8 +117,8 @@ class _LoginState extends State<Login> {
 
   Future<void> _checkLogin() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = await prefs.getString('token');
-    int? heartbeat = await prefs.getInt('heartbeat');
+    String? token = prefs.getString('token');
+    int? heartbeat = prefs.getInt('heartbeat');
     if (token != null && token.isNotEmpty && heartbeat != null) {
       final appInI = Provider.of<AppInI>(context, listen: false);
       final app_ini = appInI.app_ini;
@@ -304,16 +305,7 @@ class _LoginState extends State<Login> {
                                         opacity: animation, child: child);
                                   },
                                   child: _isLoading
-                                      ? const SizedBox(
-                                          width: 15, // 设置加载动画的宽度
-                                          height: 15, // 设置加载动画的高度
-                                          child: CircularProgressIndicator(
-                                            valueColor:
-                                                AlwaysStoppedAnimation<Color>(
-                                                    Colors.white),
-                                            strokeWidth: 3, // 设置加载动画的宽度
-                                          ),
-                                        )
+                                      ? const PumpkinLoading(size: Size(15, 15),)
                                       : Text(
                                           _message,
                                           softWrap: false,
@@ -327,7 +319,7 @@ class _LoginState extends State<Login> {
                             ),
                             ElevatedButton(
                                 onPressed: () {
-                                  Navigator.pushNamed(context, '/');
+                                  Navigator.pushReplacementNamed(context, '/');
                                 },
                                 child: const Text('点我重新加载配置'))
                           ],
