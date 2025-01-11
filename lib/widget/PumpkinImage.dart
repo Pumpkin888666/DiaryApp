@@ -1,9 +1,23 @@
 import 'package:flutter/material.dart';
 
 class PumpkinImage extends StatefulWidget {
-  final String? url;
+  final String url;
+  final BoxDecoration? decoration;
+  final bool isNetworkImage;
+  final double height;
+  final double? i_height;
+  final BoxFit fit;
+  final double width;
 
-  const PumpkinImage({super.key, required this.url});
+  const PumpkinImage(
+      {super.key,
+      required this.url,
+      this.decoration,
+      this.isNetworkImage = true,
+      required this.height,
+      this.fit = BoxFit.fill,
+      this.width = 300,
+      this.i_height});
 
   @override
   _PumpkinImageState createState() => _PumpkinImageState();
@@ -41,19 +55,28 @@ class _PumpkinImageState extends State<PumpkinImage>
         Align(
           alignment: Alignment.centerLeft,
           child: Container(
-            height: MediaQuery.of(context).size.height,
+            decoration: widget.decoration,
+            height: widget.height,
             child: AnimatedBuilder(
               animation: _widthAnimation,
               builder: (context, child) {
                 return ClipRect(
                   child: Align(
-                    alignment: Alignment.centerLeft, // 左端固定
-                    widthFactor: _widthAnimation.value, // 动态调整宽度
-                    child: Image.network(
-                      widget.url!,
-                      fit: BoxFit.fill,
-                      height: MediaQuery.of(context).size.height,
-                    ), // 替换为你的图片路径
+                    alignment: Alignment.centerLeft,
+                    widthFactor: _widthAnimation.value,
+                    child: widget.isNetworkImage
+                        ? Image.network(
+                            widget.url,
+                            fit: widget.fit,
+                            height: widget.i_height,
+                            width: widget.width,
+                          )
+                        : Image.asset(
+                            widget.url,
+                            fit: widget.fit,
+                            width: widget.width,
+                            height: widget.i_height,
+                          ),
                   ),
                 );
               },

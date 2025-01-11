@@ -15,40 +15,41 @@ class AppView extends StatefulWidget {
 }
 
 class _AppViewState extends State<AppView> {
-
   @override
   void initState() {
     super.initState();
-    _getUserInformation();
+    _tokenLogin();
   }
 
-  void _getUserInformation() async {
-    await Future.delayed(const Duration(milliseconds: 1000));
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('token');
-    int? heartbeat = prefs.getInt('heartbeat');
-    if (token != null && token.isNotEmpty && heartbeat != null) {
-      final appInI = Provider.of<AppInI>(context, listen: false);
-      final app_ini = appInI.app_ini;
-      if (app_ini!['login_catch_time'] <
-          (DateTime.now().millisecondsSinceEpoch / 1000).floor() - heartbeat) {
+  Future<void> _tokenLogin() async {
+    var userInformation = Provider.of<UserInformation>(context, listen: false);
+    var userName = userInformation.Username;
+    if (userName == null) {
+      // token login
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString('token');
+      var heartbeat = prefs.getInt('heartbeat');
+
+      if(heartbeat == null || token == null){
+        return;
+      }
+
+      // get outdated time
+      var appInI = Provider.of<AppInI>(context, listen: false);
+      var app_ini = appInI.app_ini;
+
+      var time_now = (DateTime.now().millisecondsSinceEpoch / 1000).floor();
+
+      if(time_now - heartbeat > app_ini!['login_catch_time']){
         Navigator.pushReplacementNamed(context, '/login');
       }else{
-        Map<String, dynamic> Form = {
-          'user_token':token,
+        Map<String, dynamic> data = {
+          'token' : token
         };
-        final response = await requestApi(context, 'getAppUserInformation',Form);
-        if(response != null){
-          Map res = jsonDecode(response.body);
-          final userInformation = Provider.of<UserInformation>(context, listen: false);
-          userInformation.set_information(res['data']['Information']['ini'] ?? Map());
-          userInformation.set_username(res['data']['Information']['username']);
-        }
-      }
-    }else{
-      Navigator.pushReplacementNamed(context, '/login');
-    }
+        var response = await requestApi(context, 'token_login',data);
 
+      }
+    }
   }
 
   int _selectedIndex = 0;

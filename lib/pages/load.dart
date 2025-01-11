@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:diaryapp/funcs/requestApi.dart';
 import 'package:provider/provider.dart';
 import 'package:diaryapp/models/app_ini.dart';
+import 'package:diaryapp/pages/PumpkinConfirm.dart';
+import 'package:diaryapp/pages/confirmPages/AppStatusError.dart';
 
 class Load extends StatefulWidget {
   const Load({super.key});
@@ -33,13 +35,10 @@ class _LoadState extends State<Load> {
             _message = '正在加载软件资源';
             _textColor = Colors.black;
             _reCheck = false;
-          }else{
-            _message = 'Cloud Error ${data['code']}';
-            _textColor = Colors.red;
-            _reCheck = true;
           }
         });
-        final app_ini = data['data'];
+
+        final app_ini = data['data']['configs'];
         final appInI = Provider.of<AppInI>(context,listen: false);
         appInI.set_ini(app_ini);
         await precacheImage(

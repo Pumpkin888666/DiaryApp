@@ -1,3 +1,4 @@
+import 'package:diaryapp/models/user_information.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:diaryapp/funcs/requestApi.dart';
@@ -46,7 +47,7 @@ class _LoginState extends State<Login> {
         'password': _passwordController.text,
       };
 
-      final response = await requestApi(context,'app_login', LoginForm);
+      final response = await requestApi(context,'login', LoginForm);
       if (response != false) {
         Map data = jsonDecode(response.body);
         setState(() {
@@ -58,6 +59,10 @@ class _LoginState extends State<Login> {
             await prefs.setString('token', data['data']['token']);
             await prefs.setInt('heartbeat',
                 (DateTime.now().millisecondsSinceEpoch / 1000).floor());
+            var userInformation = Provider.of<UserInformation>(context,listen: false);
+            userInformation.set_username(_usernameController.text);
+            userInformation.set_usertoken(data['data']['token']);
+
             setState(() {
               _isLoading = false;
               _message = '登录成功';
@@ -81,7 +86,7 @@ class _LoginState extends State<Login> {
             setState(() {
               _message = '账户状态异常';
               _loginButtonWidth = getStrUILength(_message,30);
-              _buttonIcon = const Icon(Icons.error_outline);
+              _buttonIcon = const Icon(Icons.shield_outlined);
             });
             break;
           case -2003:
@@ -165,7 +170,7 @@ class _LoginState extends State<Login> {
           SizedBox(
             width: 300,
             child: Column(
-              children: [PumpkinImage(url: app_ini!['login_post_url'])],
+              children: [PumpkinImage(url: app_ini!['login_post_url'],height: MediaQuery.of(context).size.height,i_height:  MediaQuery.of(context).size.height,)],
             ),
           ),
           Expanded(
