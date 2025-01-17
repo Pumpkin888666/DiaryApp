@@ -32,7 +32,7 @@ class _AppViewState extends State<AppView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('diaryapp'),
+        title: const Text('DiaryApp'),
         leading: null,
       ),
       body: Row(

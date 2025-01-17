@@ -1,5 +1,3 @@
-import 'package:diaryapp/funcs/getStrUILength.dart';
-import 'package:diaryapp/widget/PumpkinLoading.dart';
 import 'package:flutter/material.dart';
 
 class AppStatusError extends StatefulWidget {

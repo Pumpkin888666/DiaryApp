@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:diaryapp/models/app_ini.dart';
 import 'package:diaryapp/widget/PumpkinImage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:diaryapp/funcs/getStrUILength.dart';
+import 'package:diaryapp/funcs/common.dart';
 import 'package:diaryapp/widget/PumpkinLoading.dart';
 
 class Login extends StatefulWidget {
@@ -25,7 +25,6 @@ class _LoginState extends State<Login> {
   bool _isLoading = false;
   double _loginButtonWidth = 110;
   Icon _buttonIcon = const Icon(Icons.login);
-  String? _loginToken;
   bool? _isLogin;
 
   @override
@@ -58,7 +57,7 @@ class _LoginState extends State<Login> {
             SharedPreferences prefs = await SharedPreferences.getInstance();
             await prefs.setString('token', data['data']['token']);
             await prefs.setInt('heartbeat',
-                (DateTime.now().millisecondsSinceEpoch / 1000).floor());
+                getTime());
             var userInformation =
                 Provider.of<UserInformation>(context, listen: false);
             userInformation.set_username(_usernameController.text);
@@ -129,23 +128,20 @@ class _LoginState extends State<Login> {
       final appInI = Provider.of<AppInI>(context, listen: false);
       final app_ini = appInI.app_ini;
       if (app_ini!['login_catch_time'] <
-          (DateTime.now().millisecondsSinceEpoch / 1000).floor() - heartbeat) {
+          getTime() - heartbeat) {
         setState(() {
           _isLogin = false;
-          _loginToken = null;
           prefs.remove('token');
           prefs.remove('heartbeat');
         });
       } else {
         setState(() {
           _isLogin = true;
-          _loginToken = token;
         });
       }
     } else {
       setState(() {
         _isLogin = false;
-        _loginToken = null;
       });
     }
   }
@@ -154,7 +150,6 @@ class _LoginState extends State<Login> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _isLogin = false;
-      _loginToken = null;
     });
     prefs.remove('token');
     prefs.remove('heartbeat');
@@ -169,7 +164,7 @@ class _LoginState extends State<Login> {
     var appInI = Provider.of<AppInI>(context, listen: false);
     var app_ini = appInI.app_ini;
 
-    var time_now = (DateTime.now().millisecondsSinceEpoch / 1000).floor();
+    var time_now = getTime();
 
     if (heartbeat == null || token == null || time_now - heartbeat > app_ini!['login_catch_time']) {
       _removeLocalLogin();

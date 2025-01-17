@@ -10,3 +10,7 @@ double getStrUILength(String str,[double? other]) {
   }
   return width + (other ?? 0);
 }
+
+int getTime(){
+  return (DateTime.now().millisecondsSinceEpoch / 1000).floor();
+}

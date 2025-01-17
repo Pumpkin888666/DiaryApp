@@ -1,3 +1,4 @@
+import 'package:diaryapp/funcs/common.dart';
 import 'package:diaryapp/pages/PumpkinConfirm.dart';
 import 'package:diaryapp/pages/confirmPages/AppStatusError.dart';
 import 'package:flutter/material.dart';
@@ -36,7 +37,7 @@ Future<dynamic> requestApi(BuildContext context, String act,
   if (UserToken != null) {
     // 更新心跳时间
     prefs.setInt(
-        'heartbeat', (DateTime.now().millisecondsSinceEpoch / 1000).floor());
+        'heartbeat', getTime());
   }
 
   if (app_ini.containsKey('must_login_act')) {
@@ -52,7 +53,7 @@ Future<dynamic> requestApi(BuildContext context, String act,
 
   // 计算随机请求身份验证值
   var bytes = utf8.encode(
-      '$_apiKey${(DateTime.now().millisecondsSinceEpoch / 1000).floor()}$i');
+      '$_apiKey${getTime()}$i');
   var check = md5.convert(bytes);
 
   try {
