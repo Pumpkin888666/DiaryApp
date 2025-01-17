@@ -27,6 +27,12 @@ Future<dynamic> requestApi(BuildContext context, String act,
   final userInformation = Provider.of<UserInformation>(context, listen: false);
   String? UserToken = userInformation.UserToken ?? null;
   SharedPreferences prefs = await SharedPreferences.getInstance();
+  if(UserToken == null){
+    var u = prefs.getString('token') ?? null;
+    if(u != null){
+      UserToken = u;
+    }
+  }
   if (UserToken != null) {
     // 更新心跳时间
     prefs.setInt(
@@ -41,7 +47,7 @@ Future<dynamic> requestApi(BuildContext context, String act,
   }
 
   // 定义错误码
-  List localErrorCode = [-1000, -1001, -1002, -1003, 500];
+  List localErrorCode = [-1000, -1001, -1002, -1003, 500, 999];
   List tokenCode = [-2004, -2005, -2006];
 
   // 计算随机请求身份验证值
@@ -80,33 +86,36 @@ Future<dynamic> requestApi(BuildContext context, String act,
     // 请求错误检查
     if (localErrorCode.contains(res['code'])) {
       resent ??= 0;
-      if (res['code'] == -1000 && resent <= 3) {
-        // Auth 错误 进行自动重发
+      if ((res['code'] == -1000 || res['code'] == 999) && resent <= 3) {
+        // Auth 错误 Try again提示 进行自动重发
         print('resent : $resent');
-        var newRes = await requestApi(context, act, data = data, resent = resent++);
+        var newRes =
+            await requestApi(context, act, data = data, resent = resent++);
         return newRes;
       }
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => PumpkinConfirm(
-            cancel: false,
-            url: 'assets/icon/Message-Warning-256.png',
-            isNetworkImage: false,
-            height: MediaQuery.of(context).size.height,
-            fit: BoxFit.contain,
-            width: 100,
-            i_height: 100,
-            decoration: const BoxDecoration(color: Colors.red),
-            child: AppStatusError(
-              appStatus: res['code'] == -1003 ? false : true,
-              serverStatus: res['code'] == 500 ? false : true,
-              localStatus: res['code'] == 500 ? true : false,
+      if (res['code'] != 999) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PumpkinConfirm(
+              cancel: false,
+              url: 'assets/icon/Message-Warning-256.png',
+              isNetworkImage: false,
+              height: MediaQuery.of(context).size.height,
+              fit: BoxFit.contain,
+              width: 100,
+              i_height: 100,
+              decoration: const BoxDecoration(color: Colors.red),
+              child: AppStatusError(
+                appStatus: res['code'] == -1003 ? false : true,
+                serverStatus: res['code'] == 500 ? false : true,
+                localStatus: res['code'] == 500 ? true : false,
+              ),
             ),
           ),
-        ),
-      );
-      return false;
+        );
+        return false;
+      }
     }
 
     // token 检查

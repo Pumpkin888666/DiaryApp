@@ -11,7 +11,7 @@ void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
   windowManager.setResizable(false);
-
+  
   WindowOptions windowOptions = const WindowOptions(
     size: Size(1000, 600),
     center: true,

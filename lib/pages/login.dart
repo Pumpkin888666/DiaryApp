@@ -47,7 +47,7 @@ class _LoginState extends State<Login> {
         'password': _passwordController.text,
       };
 
-      final response = await requestApi(context,'login', LoginForm);
+      final response = await requestApi(context, 'login', LoginForm);
       if (response != false) {
         Map data = jsonDecode(response.body);
         setState(() {
@@ -59,14 +59,15 @@ class _LoginState extends State<Login> {
             await prefs.setString('token', data['data']['token']);
             await prefs.setInt('heartbeat',
                 (DateTime.now().millisecondsSinceEpoch / 1000).floor());
-            var userInformation = Provider.of<UserInformation>(context,listen: false);
+            var userInformation =
+                Provider.of<UserInformation>(context, listen: false);
             userInformation.set_username(_usernameController.text);
             userInformation.set_usertoken(data['data']['token']);
 
             setState(() {
               _isLoading = false;
               _message = '登录成功';
-              _loginButtonWidth = getStrUILength(_message,30);
+              _loginButtonWidth = getStrUILength(_message, 30);
               _buttonIcon = const Icon(Icons.check);
               _loginButtonStyle = ElevatedButton.styleFrom(
                 backgroundColor: Colors.green, // 背景颜色
@@ -78,21 +79,21 @@ class _LoginState extends State<Login> {
           case -2001:
             setState(() {
               _message = '未知账户';
-              _loginButtonWidth = getStrUILength(_message,30);
+              _loginButtonWidth = getStrUILength(_message, 30);
               _buttonIcon = const Icon(Icons.person);
             });
             break;
           case -2002:
             setState(() {
               _message = '账户状态异常';
-              _loginButtonWidth = getStrUILength(_message,30);
+              _loginButtonWidth = getStrUILength(_message, 30);
               _buttonIcon = const Icon(Icons.shield_outlined);
             });
             break;
           case -2003:
             setState(() {
               _message = '密码错误';
-              _loginButtonWidth = getStrUILength(_message,30);
+              _loginButtonWidth = getStrUILength(_message, 30);
               _buttonIcon = const Icon(Icons.password);
             });
         }
@@ -113,7 +114,7 @@ class _LoginState extends State<Login> {
             backgroundColor: Colors.red, // 背景颜色
             foregroundColor: Colors.white, // 字体颜色
           );
-          _loginButtonWidth = getStrUILength(_message,30);
+          _loginButtonWidth = getStrUILength(_message, 30);
           _buttonIcon = const Icon(Icons.error_outline);
         });
       }
@@ -159,6 +160,35 @@ class _LoginState extends State<Login> {
     prefs.remove('heartbeat');
   }
 
+  Future<void> _tokenLogin() async {
+    // token login
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+    var heartbeat = prefs.getInt('heartbeat');
+    // 过期检查
+    var appInI = Provider.of<AppInI>(context, listen: false);
+    var app_ini = appInI.app_ini;
+
+    var time_now = (DateTime.now().millisecondsSinceEpoch / 1000).floor();
+
+    if (heartbeat == null || token == null || time_now - heartbeat > app_ini!['login_catch_time']) {
+      _removeLocalLogin();
+      setState(() {
+        _isLogin = false;
+      });
+      return;
+    }
+
+    var response = await requestApi(context, 'token_login');
+    var res = jsonDecode(response.body);
+    if(res['code'] == 0){
+      var userInformation = Provider.of<UserInformation>(context, listen: false);
+      userInformation.set_username(res['data']['username']);
+      userInformation.set_usertoken(token);
+      Navigator.pushReplacementNamed(context, '/appview');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final appInI = Provider.of<AppInI>(context);
@@ -170,7 +200,13 @@ class _LoginState extends State<Login> {
           SizedBox(
             width: 300,
             child: Column(
-              children: [PumpkinImage(url: app_ini!['login_post_url'],height: MediaQuery.of(context).size.height,i_height:  MediaQuery.of(context).size.height,)],
+              children: [
+                PumpkinImage(
+                  url: app_ini!['login_post_url'],
+                  height: MediaQuery.of(context).size.height,
+                  i_height: MediaQuery.of(context).size.height,
+                )
+              ],
             ),
           ),
           Expanded(
@@ -206,9 +242,7 @@ class _LoginState extends State<Login> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       ElevatedButton.icon(
-                                        onPressed: () {
-                                          Navigator.pushReplacementNamed(context, '/appview');
-                                        },
+                                        onPressed: _tokenLogin,
                                         icon: const Icon(Icons.east),
                                         label: const Text('直接登录'),
                                         style: ElevatedButton.styleFrom(
@@ -310,7 +344,9 @@ class _LoginState extends State<Login> {
                                         opacity: animation, child: child);
                                   },
                                   child: _isLoading
-                                      ? const PumpkinLoading(size: Size(15, 15),)
+                                      ? const PumpkinLoading(
+                                          size: Size(15, 15),
+                                        )
                                       : Text(
                                           _message,
                                           softWrap: false,
