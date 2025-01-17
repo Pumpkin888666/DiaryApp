@@ -48,7 +48,7 @@ Future<dynamic> requestApi(BuildContext context, String act,
 
   // 定义错误码
   List localErrorCode = [-1000, -1001, -1002, -1003, 500, 999];
-  List tokenCode = [-2004, -2005, -2006];
+  List tokenCode = [-2004, -2005, -2006,-2007];
 
   // 计算随机请求身份验证值
   var bytes = utf8.encode(
@@ -92,6 +92,9 @@ Future<dynamic> requestApi(BuildContext context, String act,
         var newRes =
             await requestApi(context, act, data = data, resent = resent++);
         return newRes;
+      }
+      if(res['code'] == -2007){
+        Navigator.pushNamed(context, '/login');
       }
       if (res['code'] != 999) {
         Navigator.push(
