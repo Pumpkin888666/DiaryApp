@@ -84,6 +84,12 @@ class _WriteState extends State<Write> {
         _isDraft = true;
         _controller.document = Document.fromJson(jsonDecode(draft_text));
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('草稿加载成功 上次编辑时间：${DateFormat('yyyy-MM-dd HH:mm').format(draft_ut).toString()}'),
+          duration: Duration(seconds: 1), // Snackbar 显示的时间
+        ),
+      );
     } else if (has_draft == false && isEdit == false) {
       // 如果没有本地缓存就直接创建一个新的
       setState(() {
@@ -99,7 +105,8 @@ class _WriteState extends State<Write> {
 
     final json = jsonEncode(_controller.document.toDelta().toJson());
     prefs.setString('draft_text', json);
-    prefs.setInt('draft_t', DateFormat('yyyy-MM-dd HH:mm').parse(_date!).millisecondsSinceEpoch);
+    prefs.setInt('draft_t',
+        DateFormat('yyyy-MM-dd HH:mm').parse(_date!).millisecondsSinceEpoch);
     prefs.setInt('draft_ut', getTimeM());
     prefs.setBool('has_draft', true);
     final userInformation =
@@ -107,6 +114,12 @@ class _WriteState extends State<Write> {
     String? UserToken = userInformation.UserToken ?? null;
     prefs.setString('draft_user_token', UserToken!);
     print('save draft ok');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('草稿保存成功'),
+        duration: Duration(seconds: 1), // Snackbar 显示的时间
+      ),
+    );
   }
 
   @override
@@ -202,15 +215,24 @@ class _WriteState extends State<Write> {
               data: ThemeData(
                   colorScheme: ColorScheme.fromSeed(seedColor: Colors.red)),
               child: ElevatedButton.icon(
-                  onPressed: _isDraft ? () {
-                    remove_draft();
-                    setState(() {
-                      _isDraft = true;
-                      _controller.document = Document();
-                      _update_date = null;
-                      _date = DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now());
-                    });
-                  } : null,
+                  onPressed: _isDraft
+                      ? () {
+                          remove_draft();
+                          setState(() {
+                            _isDraft = true;
+                            _controller.document = Document();
+                            _update_date = null;
+                            _date = DateFormat('yyyy-MM-dd HH:mm')
+                                .format(DateTime.now());
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('草稿删除成功'),
+                              duration: Duration(seconds: 1), // Snackbar 显示的时间
+                            ),
+                          );
+                        }
+                      : null,
                   label: const Text('删除本地草稿'),
                   icon: const Icon(
                     Icons.delete,
