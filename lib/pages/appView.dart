@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:diaryapp/pages/appView/home.dart';
+import 'package:diaryapp/pages/appView/write.dart';
+import 'package:provider/provider.dart';
+import 'package:diaryapp/models/appView_model.dart';
 
 class AppView extends StatefulWidget {
   const AppView({super.key});
@@ -9,20 +12,18 @@ class AppView extends StatefulWidget {
 }
 
 class _AppViewState extends State<AppView> {
-  int _selectedIndex = 0;
 
   void _onDestinationSelected(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    var appview_model = Provider.of<AppViewModel>(context,listen: false);
+    appview_model.change_select(index);
   }
 
-  Widget _getSelectedPage() {
-    switch (_selectedIndex) {
+  Widget _getSelectedPage(index) {
+    switch (index) {
       case 0:
         return home();
       case 1:
-        return Placeholder();
+        return Write();
       default:
         return Center(child: Text('Page 1'));
     }
@@ -30,6 +31,9 @@ class _AppViewState extends State<AppView> {
 
   @override
   Widget build(BuildContext context) {
+    var appview_model = Provider.of<AppViewModel>(context);
+    var _index = appview_model.selectedIndex;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('DiaryApp'),
@@ -38,7 +42,7 @@ class _AppViewState extends State<AppView> {
       body: Row(
         children: [
           NavigationRail(
-            selectedIndex: _selectedIndex,
+            selectedIndex: _index,
             onDestinationSelected: _onDestinationSelected,
             labelType: NavigationRailLabelType.none,
             destinations: const [
@@ -47,12 +51,15 @@ class _AppViewState extends State<AppView> {
                 label: Text('Home'),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.search),
-                label: Text('Search'),
+                icon: Icon(Icons.mode_edit),
+                label: Text('Write'),
               ),
             ],
           ),
-          Expanded(child: _getSelectedPage()), // 根据选中的索引显示页面内容
+          Expanded(child: Align(
+            alignment: Alignment.topLeft,
+            child: _getSelectedPage(_index),
+          )), // 根据选中的索引显示页面内容
         ],
       ),
     );
