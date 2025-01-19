@@ -353,11 +353,6 @@ class _LoginState extends State<Login> {
                             const SizedBox(
                               height: 10,
                             ),
-                            ElevatedButton(
-                                onPressed: () {
-                                  Navigator.pushReplacementNamed(context, '/');
-                                },
-                                child: const Text('点我重新加载配置'))
                           ],
                         ),
                       )

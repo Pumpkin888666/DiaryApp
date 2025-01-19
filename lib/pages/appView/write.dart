@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:diaryapp/models/user_information.dart';
+import 'package:diaryapp/widget/PumpkinLoading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +8,7 @@ import 'package:diaryapp/models/appView_model.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:diaryapp/funcs/common.dart';
+import 'package:diaryapp/funcs/requestApi.dart';
 
 class Write extends StatefulWidget {
   const Write({super.key});
@@ -16,11 +18,18 @@ class Write extends StatefulWidget {
 }
 
 class _WriteState extends State<Write> {
+  String _message = '保存日记到云端';
+  ButtonStyle _uploadButtonStyle = const ButtonStyle();
+  bool _isLoading = false;
+  double _uploadButtonWidth = getStrUILength('保存日记到云端');
+  Icon _buttonIcon = const Icon(Icons.cloud_upload_outlined);
   final QuillController _controller = QuillController.basic();
 
   bool _isDraft = true;
+  bool _isEdit = false;
   String? _date;
   String? _update_date;
+  String? diary_code;
 
   @override
   void initState() {
@@ -40,12 +49,18 @@ class _WriteState extends State<Write> {
   void checkStatus() async {
     var appview_model = Provider.of<AppViewModel>(context, listen: false);
     bool isEdit = appview_model.isEdit;
+    setState(() {
+      diary_code = appview_model.diaryCode;
+    });
 
     if (isEdit) {
       setState(() {
         _isDraft = false;
+        _isEdit = true;
       });
       // edit load
+
+      print('edit event');
 
       return; // 阻止继续加载草稿
     }
@@ -86,7 +101,8 @@ class _WriteState extends State<Write> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('草稿加载成功 上次编辑时间：${DateFormat('yyyy-MM-dd HH:mm').format(draft_ut).toString()}'),
+          content: Text(
+              '草稿加载成功 上次编辑时间：${DateFormat('yyyy-MM-dd HH:mm').format(draft_ut).toString()}'),
           duration: Duration(seconds: 1), // Snackbar 显示的时间
         ),
       );
@@ -100,7 +116,8 @@ class _WriteState extends State<Write> {
     }
   }
 
-  void save_draft() async {
+  void save_draft([bool? show]) async {
+    if (!mounted) return; // 检查组件是否挂载
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     final json = jsonEncode(_controller.document.toDelta().toJson());
@@ -114,12 +131,107 @@ class _WriteState extends State<Write> {
     String? UserToken = userInformation.UserToken ?? null;
     prefs.setString('draft_user_token', UserToken!);
     print('save draft ok');
+    // if(show != null && show == false){
+    //   return;
+    // }
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('草稿保存成功'),
         duration: Duration(seconds: 1), // Snackbar 显示的时间
       ),
     );
+  }
+
+  void save_cloud() async {
+    setState(() {
+      _isLoading = true;
+      _uploadButtonWidth = 70;
+    });
+    await Future.delayed(const Duration(milliseconds: 500)); // 让按钮动画好看一点 呵呵
+    final json = jsonEncode(_controller.document.toDelta().toJson());
+    final int create_time =
+        (DateFormat('yyyy-MM-dd HH:mm').parse(_date!).millisecondsSinceEpoch /
+                1000)
+            .floor();
+    Map<String, dynamic> data = {'text': json, 'create_time': create_time};
+    if (_isEdit) {
+      data.addAll({'diary_code': diary_code});
+    }
+    var response = await requestApi(context, 'save_diary', data = data);
+    var res = jsonDecode(response.body);
+    var appview_model = Provider.of<AppViewModel>(context, listen: false);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    switch (res['code']) {
+      case 0:
+        remove_draft();
+        setState(() {
+          _isLoading = false;
+          if (res['data']['update']) {
+            _message = '日记更新成功';
+          } else {
+            _message = '日记保存成功';
+          }
+          _uploadButtonWidth = getStrUILength(_message, 20);
+          _buttonIcon = Icon(Icons.check);
+          _uploadButtonStyle = ElevatedButton.styleFrom(
+            backgroundColor: Colors.green, // 背景颜色
+            foregroundColor: Colors.white, // 字体颜色
+          );
+          _isDraft = false;
+          _isEdit = true;
+          diary_code = res['data']['diary_code'];
+          appview_model.diaryCode = res['data']['code'];
+        });
+        break;
+      case -3003:
+        save_draft(false);
+        setState(() {
+          _isLoading = false;
+          _message = '日记保存失败';
+          _uploadButtonWidth = getStrUILength(_message, 20);
+          _buttonIcon = const Icon(Icons.close);
+          _uploadButtonStyle = ElevatedButton.styleFrom(
+            backgroundColor: Colors.red, // 背景颜色
+            foregroundColor: Colors.white, // 字体颜色
+          );
+        });
+        break;
+      case -3002:
+        save_draft(false);
+        setState(() {
+          _isLoading = false;
+          _message = '请求参数错误';
+          _uploadButtonWidth = getStrUILength(_message, 20);
+          _buttonIcon = const Icon(Icons.token);
+          _uploadButtonStyle = ElevatedButton.styleFrom(
+            backgroundColor: Colors.red, // 背景颜色
+            foregroundColor: Colors.white, // 字体颜色
+          );
+          _isDraft = true;
+          _isEdit = false;
+          diary_code = null;
+          appview_model.diaryCode = null;
+          prefs.remove('token');
+        });
+        break;
+      case -3001:
+        save_draft(false);
+        setState(() {
+          _isLoading = false;
+          _message = '请求参数错误';
+          _uploadButtonWidth = getStrUILength(_message, 20);
+          _buttonIcon = const Icon(Icons.code);
+          _uploadButtonStyle = ElevatedButton.styleFrom(
+            backgroundColor: Colors.red, // 背景颜色
+            foregroundColor: Colors.white, // 字体颜色
+          );
+          _isDraft = true;
+          _isEdit = false;
+          diary_code = null;
+          appview_model.diaryCode = null;
+        });
+        break;
+    }
   }
 
   @override
@@ -200,10 +312,40 @@ class _WriteState extends State<Write> {
           Theme(
             data: ThemeData(
                 colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue)),
-            child: ElevatedButton.icon(
-                onPressed: () {},
-                label: const Text('保存日记到云端'),
-                icon: const Icon(Icons.cloud_upload_outlined)),
+            // child: ElevatedButton.icon(
+            //     onPressed: null,
+            //     label: const Text('保存日记到云端'),
+            //     icon: const Icon(Icons.cloud_upload_outlined)),
+            child: AnimatedContainer(
+              height: 32,
+              curve: Curves.easeInOut,
+              duration: const Duration(milliseconds: 150),
+              // 设置按钮大小变化的过渡时间
+              width: _uploadButtonWidth,
+              child: ElevatedButton.icon(
+                icon: _isLoading ? null : _buttonIcon,
+                onPressed: _isLoading ? null : save_cloud, // 加载时禁用按钮
+                style: _uploadButtonStyle,
+                label: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 150),
+                  // 设置按钮内部内容过渡的时间
+                  transitionBuilder:
+                      (Widget child, Animation<double> animation) {
+                    // 使用 FadeTransition 或其他过渡效果
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                  child: _isLoading
+                      ? const PumpkinLoading(
+                          size: Size(15, 15),
+                        )
+                      : Text(
+                          _message,
+                          softWrap: false,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                ),
+              ),
+            ),
           ),
           const SizedBox(
             height: 5,
