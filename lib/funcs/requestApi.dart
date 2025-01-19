@@ -131,6 +131,15 @@ Future<dynamic> requestApi(BuildContext context, String act,
       }
     }
 
+    if(res['code'] == -1){
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(res['msg']),
+          duration: const Duration(seconds: 2), // Snackbar 显示的时间
+        ),
+      );
+    }
+
     // 检查通过
     return response;
   } catch (e) {

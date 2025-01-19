@@ -49,6 +49,7 @@ class _WriteState extends State<Write> {
   void checkStatus() async {
     var appview_model = Provider.of<AppViewModel>(context, listen: false);
     bool isEdit = appview_model.isEdit;
+    print('isEdit $isEdit');
     setState(() {
       diary_code = appview_model.diaryCode;
     });
@@ -61,6 +62,32 @@ class _WriteState extends State<Write> {
       // edit load
 
       print('edit event');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if(mounted){
+          var appview_model = Provider.of<AppViewModel>(context, listen: false);
+          appview_model.change_edit_bool(false);
+        }
+      });
+
+      if (appview_model.diaryCode == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('参数错误 [cs001]'),
+            duration: Duration(seconds: 1), // Snackbar 显示的时间
+          ),
+        );
+      }
+      Map<String, dynamic> data = {'diary_code': appview_model.diaryCode};
+      var response = await requestApi(context, 'get_diary', data = data);
+      var res = jsonDecode(response.body);
+      if (res['code'] == 0) {
+        setState(() {
+          remove_draft();
+          _controller.document = Document.fromJson(jsonDecode(res['data']['text']));
+          _date = res['data']['od']['create_time'].toString().substring(0,16);
+          _update_date = res['data']['od']['update_time'].toString().substring(0,16);
+        });
+      }
 
       return; // 阻止继续加载草稿
     }
@@ -131,9 +158,9 @@ class _WriteState extends State<Write> {
     String? UserToken = userInformation.UserToken ?? null;
     prefs.setString('draft_user_token', UserToken!);
     print('save draft ok');
-    // if(show != null && show == false){
-    //   return;
-    // }
+    if (show != null && show == false) {
+      return;
+    }
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('草稿保存成功'),
@@ -180,7 +207,7 @@ class _WriteState extends State<Write> {
           _isDraft = false;
           _isEdit = true;
           diary_code = res['data']['diary_code'];
-          appview_model.diaryCode = res['data']['code'];
+          appview_model.change_diaryCdoe(res['data']['code']);
         });
         break;
       case -3003:
@@ -340,7 +367,8 @@ class _WriteState extends State<Write> {
                         )
                       : Text(
                           _message,
-                          softWrap: false,
+                          softWrap: true,
+                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                 ),

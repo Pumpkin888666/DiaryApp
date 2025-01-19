@@ -20,10 +20,10 @@ class _LoginState extends State<Login> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final _loginFormKey = GlobalKey<FormState>();
-  String _message = 'Login';
+  String _message = '登录';
   ButtonStyle _loginButtonStyle = ButtonStyle();
   bool _isLoading = false;
-  double _loginButtonWidth = 110;
+  double _loginButtonWidth = 100;
   Icon _buttonIcon = const Icon(Icons.login);
   bool? _isLogin;
 
@@ -56,8 +56,7 @@ class _LoginState extends State<Login> {
           case 0:
             SharedPreferences prefs = await SharedPreferences.getInstance();
             await prefs.setString('token', data['data']['token']);
-            await prefs.setInt('heartbeat',
-                getTime());
+            await prefs.setInt('heartbeat', getTime());
             var userInformation =
                 Provider.of<UserInformation>(context, listen: false);
             userInformation.set_username(_usernameController.text);
@@ -127,8 +126,7 @@ class _LoginState extends State<Login> {
     if (token != null && token.isNotEmpty && heartbeat != null) {
       final appInI = Provider.of<AppInI>(context, listen: false);
       final app_ini = appInI.app_ini;
-      if (app_ini!['login_catch_time'] <
-          getTime() - heartbeat) {
+      if (app_ini!['login_catch_time'] < getTime() - heartbeat) {
         setState(() {
           _isLogin = false;
           prefs.remove('token');
@@ -166,7 +164,9 @@ class _LoginState extends State<Login> {
 
     var time_now = getTime();
 
-    if (heartbeat == null || token == null || time_now - heartbeat > app_ini!['login_catch_time']) {
+    if (heartbeat == null ||
+        token == null ||
+        time_now - heartbeat > app_ini!['login_catch_time']) {
       _removeLocalLogin();
       setState(() {
         _isLogin = false;
@@ -176,8 +176,9 @@ class _LoginState extends State<Login> {
 
     var response = await requestApi(context, 'token_login');
     var res = jsonDecode(response.body);
-    if(res['code'] == 0){
-      var userInformation = Provider.of<UserInformation>(context, listen: false);
+    if (res['code'] == 0) {
+      var userInformation =
+          Provider.of<UserInformation>(context, listen: false);
       userInformation.set_username(res['data']['username']);
       userInformation.set_usertoken(token);
       Navigator.pushReplacementNamed(context, '/appview');
@@ -355,7 +356,7 @@ class _LoginState extends State<Login> {
                             ),
                           ],
                         ),
-                      )
+                      ),
               ],
             ),
           )

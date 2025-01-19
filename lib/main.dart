@@ -3,6 +3,7 @@ import 'package:flutter_quill/translations.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:diaryapp/pages/load.dart';
 import 'package:diaryapp/pages/login.dart';
+import 'package:diaryapp/pages/look.dart';
 import 'package:diaryapp/pages/appView.dart';
 import 'package:provider/provider.dart';
 import 'package:diaryapp/models/app_ini.dart';
@@ -58,6 +59,7 @@ class App extends StatelessWidget {
         '/': (context) => const Load(),
         '/login': (context) => const Login(),
         '/appview': (context) => const AppView(),
+        '/look':(context) => const Look(),
       },
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,

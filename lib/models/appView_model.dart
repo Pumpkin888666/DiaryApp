@@ -15,5 +15,9 @@ class AppViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void change_diaryCdoe(dc){
+    diaryCode = dc;
+    notifyListeners();
+  }
 
 }

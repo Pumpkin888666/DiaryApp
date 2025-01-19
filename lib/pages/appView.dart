@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:diaryapp/pages/appView/home.dart';
 import 'package:diaryapp/pages/appView/write.dart';
+import 'package:diaryapp/pages/appView/diarylist.dart';
 import 'package:provider/provider.dart';
 import 'package:diaryapp/models/appView_model.dart';
 
@@ -24,8 +25,10 @@ class _AppViewState extends State<AppView> {
         return home();
       case 1:
         return Write();
+      case 2:
+        return DiaryList();
       default:
-        return Center(child: Text('Page 1'));
+        return const Center(child: Text('当你看见我 说明你点的这个页面我没做 (●\'◡\'●)'));
     }
   }
 
@@ -54,6 +57,11 @@ class _AppViewState extends State<AppView> {
                 icon: Icon(Icons.mode_edit),
                 label: Text('Write'),
               ),
+              NavigationRailDestination(
+                icon: Icon(Icons.list),
+                label: Text('List'),
+              ),
+
             ],
           ),
           Expanded(child: Align(
