@@ -55,6 +55,27 @@ class _DiaryListState extends State<DiaryList> {
     appview_model.change_select(1);
   }
 
+  void delete(diary_code) async{
+    Map<String,dynamic> data = {
+      'diary_code' : diary_code,
+    };
+    var response = await requestApi(context, 'diary_destroy',data = data);
+    var res = jsonDecode(response.body);
+    if(res['code'] == 0){
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('/(ㄒoㄒ)/~~将日记移入回收站成功~'),
+          duration: Duration(seconds: 1), // Snackbar 显示的时间
+        ),
+      );
+      setState(() {
+        _load = true;
+      });
+      await Future.delayed(const Duration(milliseconds: 500));
+      LoadDiary(); // reload
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_load) {
@@ -71,7 +92,7 @@ class _DiaryListState extends State<DiaryList> {
         ),
       );
     }
-    return Container(
+    return items.length > 0 ? Container(
       child: ListView.builder(
           itemCount: _diaryCount,
           itemBuilder: (BuildContext context, int index) {
@@ -156,7 +177,9 @@ class _DiaryListState extends State<DiaryList> {
                                       colorScheme: ColorScheme.fromSeed(
                                           seedColor: Colors.red)),
                                   child: ElevatedButton.icon(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      delete(items[index]['diary_code']);
+                                    },
                                     style: ButtonStyle(
                                       shape: WidgetStateProperty.all(
                                         const RoundedRectangleBorder(
@@ -183,7 +206,7 @@ class _DiaryListState extends State<DiaryList> {
               ),
             );
           }),
-    );
+    ) : const Center(child: Text('(●\'◡\'●) 啥都没有'),);
   }
 
   @override
