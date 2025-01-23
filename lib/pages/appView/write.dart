@@ -63,7 +63,7 @@ class _WriteState extends State<Write> {
 
       print('edit event');
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if(mounted){
+        if (mounted) {
           var appview_model = Provider.of<AppViewModel>(context, listen: false);
           appview_model.change_edit_bool(false);
         }
@@ -83,9 +83,11 @@ class _WriteState extends State<Write> {
       if (res['code'] == 0) {
         setState(() {
           remove_draft();
-          _controller.document = Document.fromJson(jsonDecode(res['data']['text']));
-          _date = res['data']['od']['create_time'].toString().substring(0,16);
-          _update_date = res['data']['od']['update_time'].toString().substring(0,16);
+          _controller.document =
+              Document.fromJson(jsonDecode(res['data']['text']));
+          _date = res['data']['od']['create_time'].toString().substring(0, 16);
+          _update_date =
+              res['data']['od']['update_time'].toString().substring(0, 16);
         });
       }
 
@@ -286,10 +288,21 @@ class _WriteState extends State<Write> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-              color: Colors.red,
+              // color: Colors.red,
               height: 300,
               child: ListView(
-                children: const [Text('已保存日记显示区')],
+                children: const [
+                  Text(
+                    '1.不得上传违法、恶意、暴力或侵犯他人权益的内容。\n'
+                    '2.避免发布侮辱、骚扰或侵犯隐私的言论。\n'
+                    '3.您对发布的内容负责，请确保不侵犯他人权益。\n'
+                    '4.避免记录敏感信息，保护个人隐私。\n'
+                    '5.不得滥用云存储，避免恶意上传。\n'
+                    '6.我们保留删除违反规定内容的权利。\n'
+                    '7.我们不对数据丢失负责，请定期备份。\n'
+                    '继续使用即表示您同意上述条款。如有疑问，请联系客户支持。',
+                  )
+                ],
               )),
           const SizedBox(
             height: 10,
@@ -339,10 +352,6 @@ class _WriteState extends State<Write> {
           Theme(
             data: ThemeData(
                 colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue)),
-            // child: ElevatedButton.icon(
-            //     onPressed: null,
-            //     label: const Text('保存日记到云端'),
-            //     icon: const Icon(Icons.cloud_upload_outlined)),
             child: AnimatedContainer(
               height: 32,
               curve: Curves.easeInOut,

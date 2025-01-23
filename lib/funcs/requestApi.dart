@@ -53,7 +53,7 @@ Future<dynamic> requestApi(BuildContext context, String act,
 
   // 计算随机请求身份验证值
   var bytes = utf8.encode(
-      '$_apiKey${getTime()}$i');
+      '$_apiKey${(getTime() / 100).floor()}$i');
   var check = md5.convert(bytes);
 
   try {
@@ -76,10 +76,25 @@ Future<dynamic> requestApi(BuildContext context, String act,
 
     // 检查响应
     var res = json.decode(response.body);
+    if(res['t'] - getTime() > 30){
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('请求延迟过高，请检查网络设置。[t]'),
+          duration: Duration(seconds: 2), // Snackbar 显示的时间
+        ),
+      );
+      return false;
+    }
     var checkBytes = utf8.encode(
-        '$_apiKey${res['msg']}${res['code']}${(DateTime.now().millisecondsSinceEpoch / 1000).floor()}');
+        '$_apiKey${res['msg']}${res['code']}${res['t']}');
     var resCheck = md5.convert(checkBytes).toString();
     if (res['check'] != resCheck) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('响应验证不通过。'),
+          duration: Duration(seconds: 2), // Snackbar 显示的时间
+        ),
+      );
       return false;
     }
 
@@ -87,12 +102,14 @@ Future<dynamic> requestApi(BuildContext context, String act,
     // 请求错误检查
     if (localErrorCode.contains(res['code'])) {
       resent ??= 0;
-      if ((res['code'] == -1000 || res['code'] == 999) && resent <= 3) {
-        // Auth 错误 Try again提示 进行自动重发
-        print('resent : $resent');
-        var newRes =
-            await requestApi(context, act, data = data, resent = resent++);
-        return newRes;
+      if (res['code'] == -1000 || res['code'] == 999) {
+        if(resent <= 3){
+          // Auth 错误 Try again提示 进行自动重发
+          print('resent : $resent');
+          var newRes =
+          await requestApi(context, act, data = data, resent = resent + 1);
+          return newRes;
+        }
       }
       if(res['code'] == -2007){
         Navigator.pushNamed(context, '/login');

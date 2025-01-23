@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'package:diaryapp/funcs/requestApi.dart';
 import 'package:provider/provider.dart';
 import 'package:diaryapp/models/app_ini.dart';
-import 'package:diaryapp/pages/PumpkinConfirm.dart';
-import 'package:diaryapp/pages/confirmPages/AppStatusError.dart';
 
 class Load extends StatefulWidget {
   const Load({super.key});

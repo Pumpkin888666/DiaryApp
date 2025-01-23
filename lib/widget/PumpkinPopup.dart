@@ -1,6 +1,5 @@
 import 'package:diaryapp/widget/PumpkinLoading.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class LoadingState extends ChangeNotifier {
   bool _isLoading = true;

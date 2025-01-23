@@ -61,6 +61,10 @@ class _AppViewState extends State<AppView> {
                 icon: Icon(Icons.list),
                 label: Text('List'),
               ),
+              NavigationRailDestination(
+                icon: Icon(Icons.delete),
+                label: Text('Trash'),
+              ),
 
             ],
           ),
