@@ -1,16 +1,25 @@
-# diaryapp
+# DiaryApp
 
-log your days
+开源、开放、免费、安全  
+记录你的每一天。
 
-## Getting Started
+## 更改 APP 默认设置
 
-This project is a starting point for a Flutter application.
+### 配置文件
 
-A few resources to get you started if this is your first Flutter project:
+1. **`models/app_ini.dart`**
+    - `apiUrl`：API 接口地址。
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+2. **`funcs/requestApi.dart`**
+    - `_apiKey`：API 密钥。
+    - 对应的 Server 端在数据库中的配置：`app_settings -> api_key`。
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 注意事项
+请务必小心，避免使用不信任的 API 接口，否则你的数据可能会泄露。
+
+## 打包 App
+
+执行以下命令进行打包：
+
+```bash
+flutter build windows
