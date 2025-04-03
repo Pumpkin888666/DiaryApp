@@ -1,25 +1,25 @@
 # DiaryApp
 
-开源、开放、免费、安全  
-记录你的每一天。
+Open source, open, free, and secure
+Record your every day.
 
-## 更改 APP 默认设置
+##Change the default settings of the app
 
-### 配置文件
+###Configuration file
 
 1. **`models/app_ini.dart`**
-    - `apiUrl`：API 接口地址。
+-ApiURL: API interface address.
 
 2. **`funcs/requestApi.dart`**
-    - `_apiKey`：API 密钥。
-    - 对应的 Server 端在数据库中的配置：`app_settings -> api_key`。
+-`'apiKey `: API key.
+-The corresponding server-side configuration in the database:` app_settings -> api_key`。
 
-### 注意事项
-请务必小心，避免使用不信任的 API 接口，否则你的数据可能会泄露。
+###Precautions
+Please be careful and avoid using untrusted API interfaces, otherwise your data may be leaked.
 
-## 打包 App
+##Package App
 
-执行以下命令进行打包：
+Execute the following command to package:
 
 ```bash
 flutter build windows
